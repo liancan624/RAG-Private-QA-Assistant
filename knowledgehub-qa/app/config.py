@@ -23,3 +23,8 @@ DEFAULT_CHUNK_THRESHOLD = 85
 # ========== 服务配置 ==========
 DEFAULT_HOST = "0.0.0.0"
 DEFAULT_PORT = 8000
+
+# ========== 混合检索配置 ==========
+BM25_WEIGHT = 0.4       # BM25 关键词检索权重
+VECTOR_WEIGHT = 0.6     # 向量语义检索权重
+HYBRID_TOP_K = 20       # 混合召回候选数量
