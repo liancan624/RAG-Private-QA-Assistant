@@ -35,23 +35,23 @@ knowledgehub-qa/
 │   │   └── chat.py          # 问答接口
 │   ├── core/                # 核心业务层：RAG 核心能力
 │   │   ├── __init__.py
-│   │   ├── rag_engine.py    # RAG 问答编排逻辑（原 rag_engine.py）
-│   │   └── reranker.py      # 语义重排序模块（原 reranker.py）
+│   │   ├── models.py        # 全局模型单例
+│   │   ├── rag_engine.py    # RAG 问答编排逻辑
+│   │   └── reranker.py      # 语义重排序模块
 │   ├── services/            # 服务层：业务逻辑封装，衔接接口与数据层
 │   │   ├── __init__.py
 │   │   ├── document_service.py  # 文档处理服务
 │   │   └── vector_service.py    # 向量库构建与检索服务
 │   ├── utils/               # 工具层：通用无状态工具
 │   │   ├── __init__.py
-│   │   └── doc_processor.py     # 文档解析、清洗、语义分块（原 doc_processor.py）
+│   │   └── doc_processor.py     # 文档解析、清洗、语义分块
 │   └── db/                  # 数据层：数据持久化交互
 │       ├── __init__.py
-│       └── vector_db.py         # 向量数据库封装（原 vector_db.py）
+│       └── vector_db.py         # 向量数据库封装
 ├── frontend/                # 前端层：与后端完全解耦
 │   └── streamlit_app.py     # 原 frontend.py
-├── data/                    # 运行时数据目录（与代码完全隔离）
+├── data/                    # 运行时数据目录
 │   └── knowledge_bases/     # 原 knowledge_bases 目录迁移到此处
-├── requirements.txt         # 项目依赖清单
 └── README.md                # 项目说明文档
 ```
 
