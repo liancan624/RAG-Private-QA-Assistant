@@ -11,13 +11,13 @@
 ## 封装接口
 项目使用 FastAPI 封装后端接口（app.py文件），在项目根目录执行下面命令启动服务：
 ```bash
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ## 前端页面
 项目使用 Streamlit 快速搭建前端，MVP 阶段快速验证（frontend.py文件），在项目根目录执行下面命令，浏览器会自动打开页面：
 ```bash
-streamlit run frontend.py
+streamlit run frontend/streamlit_app.py
 ```
 
 ## 更新代码架构
