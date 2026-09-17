@@ -16,6 +16,10 @@ from app.config import DEFAULT_HOST, DEFAULT_PORT
 from app.core import models  # noqa: F401
 
 def create_app() -> FastAPI:
+    # 自动初始化数据目录，无需手动创建
+    from app.services.document_service import DocumentService
+    DocumentService.init_root_dir()
+
     app = FastAPI(
         title="自定义知识库问答助手 API",
         version="1.0.0",
