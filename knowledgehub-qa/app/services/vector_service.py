@@ -24,9 +24,9 @@ class VectorService:
     @classmethod
     def build_kb(cls, kb_id: str) -> dict:
         """构建指定知识库的向量索引"""
-        kb_dir = DocumentService.get_kb_path(kb_id)
+        docs_dir = DocumentService.get_docs_path(kb_id)
 
-        documents = load_folder_documents(kb_dir)
+        documents = load_folder_documents(docs_dir)
         if not documents:
             raise ValueError("该知识库下没有可加载的文档")
 
@@ -42,9 +42,9 @@ class VectorService:
         vector_db = build_vector_store(split_docs, embedding_model, chroma_path)
 
         # 2. 构建 BM25 索引并持久化
-        bm25_path = os.path.join(DocumentService.get_kb_path(kb_id), "bm25_index.pkl")
+        bm25_file = os.path.join(DocumentService.get_bm25_path(kb_id), "bm25_index.pkl")
         bm25_store = BM25Store(split_docs)
-        bm25_store.save(bm25_path)
+        bm25_store.save(bm25_file)
 
         # 3. 写入缓存
         cls._kb_cache[kb_id] = vector_db
@@ -72,11 +72,11 @@ class VectorService:
         if kb_id in cls._bm25_cache:
             return cls._bm25_cache[kb_id]
 
-        bm25_path = os.path.join(DocumentService.get_kb_path(kb_id), "bm25_index.pkl")
-        if not os.path.exists(bm25_path):
+        bm25_file = os.path.join(DocumentService.get_bm25_path(kb_id), "bm25_index.pkl")
+        if not os.path.exists(bm25_file):
             raise ValueError("BM25 索引不存在，请重新构建知识库")
 
-        bm25_store = BM25Store.load(bm25_path)
+        bm25_store = BM25Store.load(bm25_file)
         cls._bm25_cache[kb_id] = bm25_store
         return bm25_store
 
