@@ -93,5 +93,5 @@ class VectorService:
         return HybridRetriever(
             vector_retriever=vector_retriever,
             bm25_store=bm25_store,
-            top_k=HYBRID_TOP_K
+            top_k=top_k
         )
