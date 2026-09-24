@@ -35,7 +35,7 @@ class HybridRetriever(BaseRetriever):
             vec_range = max_vec - min_vec if max_vec != min_vec else 1
 
             for doc, score in vector_results:
-                norm_score = (score - min_vec) / vec_range
+                norm_score = (max_vec - score) / vec_range
                 doc_id = self._doc_id(doc)
                 doc_scores[doc_id] = {
                     "doc": doc,
