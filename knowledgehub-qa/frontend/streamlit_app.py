@@ -1,21 +1,37 @@
 import streamlit as st
 import requests
+from streamlit_local_storage import LocalStorage
 
 BACKEND_BASE = "http://localhost:8000"
 
 st.set_page_config(page_title="自定义知识库问答助手", layout="wide")
 
+localS = LocalStorage()
+
 # ========== 侧边栏 ==========
 with st.sidebar:
     st.header("⚙️ 模型配置")
-    model_name = st.text_input("模型名称", value="glm-4-flash")
-    api_key = st.text_input("API Key", type="password")
-    base_url = st.text_input("接口地址", value="https://open.bigmodel.cn/api/paas/v4/")
+
+    saved_config = localS.getItem("llm_config") or {}
+    if saved_config is None:
+        saved_config = {}
+
+    model_name = st.text_input("模型名称", value=saved_config.get("model_name", ""), placeholder="请输入模型名称")
+    api_key = st.text_input("API Key", value=saved_config.get("api_key", ""), type="password", placeholder="请输入API密钥")
+    base_url = st.text_input("接口地址", value=saved_config.get("base_url", ""), placeholder="请输入接口地址")
+
+    current_config = {
+        "model_name": model_name,
+        "api_key": api_key,
+        "base_url": base_url
+    }
+    if current_config != saved_config:
+        localS.setItem("llm_config", current_config)
 
     if st.button("测试连接"):
         resp = requests.post(
             f"{BACKEND_BASE}/api/model/test",
-            json={"model_name": model_name, "api_key": api_key, "base_url": base_url}
+            json=current_config
         )
         if resp.status_code == 200:
             st.success("模型连接成功")
@@ -32,11 +48,21 @@ with st.sidebar:
 
     kb_list = st.session_state.get("kb_list", [])
     kb_names = [kb["kb_id"] for kb in kb_list]
-    current_kb = st.selectbox("当前知识库", options=kb_names)
 
+    current_kb = st.selectbox("当前知识库", options=kb_names)
     new_kb_id = st.text_input("新建知识库ID")
+
     if st.button("创建知识库") and new_kb_id:
-        st.success(f"知识库 {new_kb_id} 已创建，上传文件后即可构建")
+        resp = requests.post(f"{BACKEND_BASE}/api/knowledge/{new_kb_id}/create")
+
+        if resp.status_code == 200:
+            st.success(f"知识库{new_kb_id}创建成功！")
+            list_resp = requests.get(f"{BACKEND_BASE}/api/knowledge/list")
+            if list_resp.status_code == 200:
+                st.session_state["kb_list"] = list_resp.json()["knowledge_bases"]
+            st.rerun()
+        else:
+            st.error(f"创建失败：{resp.text}")
 
     uploaded_files = st.file_uploader(
         "上传文档",
