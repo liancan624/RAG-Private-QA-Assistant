@@ -10,7 +10,7 @@ class BgeReranker:
     def __init__(self, model_name: str, device: str = "cpu"):
         self.model = CrossEncoder(model_name, device=device)
 
-    def rerank(self, query: str, documents: List[Document], top_k: int = 3) -> List[Document]:
+    def rerank(self, query: str, documents: List[Document], top_k: int = 3, threshold: float = 0.0) -> List[Document]:
         if not documents:
             return []
 
@@ -20,6 +20,8 @@ class BgeReranker:
         scored_docs = list(zip(documents, scores))
         scored_docs.sort(key=lambda x: x[1], reverse=True)
 
-        return [doc for doc, score in scored_docs[:top_k]]
+        valid_docs = [doc for doc, score in scored_docs if score > threshold]
+
+        return valid_docs[:top_k]
 
 
