@@ -17,4 +17,4 @@ def chinese_tokenizer(text: str) -> list[str]:
     # 精确模式分词
     tokens = jieba.lcut(text.strip())
     # 过滤空字符和单字
-    return [token for token in tokens if len(token.strip()) > 1]
+    return [token for token in tokens if len(token.strip()) > 0]
