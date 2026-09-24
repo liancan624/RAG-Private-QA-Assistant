@@ -5,19 +5,24 @@
 import os
 from typing import List
 from langchain_core.documents import Document
-from langchain_community.document_loaders import PyPDFLoader, TextLoader, Docx2txtLoader
+from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_community.embeddings import HuggingFaceEmbeddings
 
 def _get_loader(file_path: str):
     """根据文件后缀选择加载器"""
     ext = os.path.splitext(file_path)[1].lower()
-    if ext == ".pdf":
-        return PyPDFLoader(file_path)
+
+    if ext in [".pdf", ".docx", ".doc"]:
+        return UnstructuredFileLoader(
+            file_path,
+            mode="elements",    # 将文档拆分为独立的元素
+            strategy="hi_res",  # 高分辨率策略，支持复杂的表格和OCR
+            pdf_infer_table_structure=True  # 开启PDF表格结构推断
+        )
     elif ext in [".txt", ".md"]:
+        from langchain_community.document_loaders import TextLoader
         return TextLoader(file_path, encoding="utf-8")
-    elif ext in [".docx", ".doc"]:
-        return Docx2txtLoader(file_path)
     else:
         raise ValueError(f"不支持的文件格式：{ext}")
 
@@ -31,12 +36,16 @@ def load_folder_documents(folder_path: str) -> List[Document]:
         try:
             loader = _get_loader(file_path)
             docs = loader.load()
+
             for doc in docs:
                 doc.metadata["source"] = filename
+                if doc.metadata.get("category") == "Table":
+                    doc.metadata["is_table"] = True
+
             documents.extend(docs)
-            print(f"已加载：{filename}")
+            print(f"加载加载文件：{filename}")
         except Exception as e:
-            print(f"加载失败 {filename}：{str(e)}")
+            print(f"加载文件失败 {filename}，错误：{str(e)}")
     return documents
 
 def semantic_chunk_documents(
